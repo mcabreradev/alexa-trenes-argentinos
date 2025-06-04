@@ -1,0 +1,228 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "horarios de trenes",
+      "intents": [
+        {
+          "name": "GetNextTrainIntent",
+          "slots": [
+            {
+              "name": "origen",
+              "type": "ESTACION"
+            }
+          ],
+          "samples": [
+            "cuándo sale el próximo tren en {origen}",
+            "horario de trenes en {origen}",
+            "próximo tren desde {origen}",
+            "a qué hora sale el próximo tren en {origen}",
+            "horarios en {origen}",
+            "cuál es el próximo tren en {origen}",
+            "cuándo pasa el tren por {origen}"
+          ]
+        },
+        {
+          "name": "GetTrainBetweenStationsIntent",
+          "slots": [
+            {
+              "name": "origen",
+              "type": "ESTACION"
+            },
+            {
+              "name": "destino",
+              "type": "ESTACION"
+            }
+          ],
+          "samples": [
+            "tren de {origen} a {destino}",
+            "horarios entre {origen} y {destino}",
+            "próximo tren de {origen} a {destino}",
+            "cuándo sale el tren de {origen} a {destino}",
+            "cuándo pasa el tren desde {origen} a {destino}",
+            "a qué hora pasa el tren desde {origen} a {destino}",
+            "horario del tren de {origen} a {destino}",
+            "tren desde {origen} hasta {destino}",
+            "cuándo puedo ir de {origen} a {destino}",
+            "tren {origen} {destino}"
+          ]
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": [
+            "detener",
+            "parar",
+            "salir",
+            "terminar",
+            "cancelar",
+            "ya no quiero usar la skill"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": [
+            "ayuda",
+            "ayúdame",
+            "necesito ayuda",
+            "cómo funciona",
+            "qué puedo hacer",
+            "qué puedes hacer",
+            "instrucciones"
+          ]
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": [
+            "cancelar",
+            "olvidalo",
+            "cancela esto"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "ESTACION",
+          "values": [
+            {
+              "name": {
+                "value": "Retiro",
+                "synonyms": [
+                  "Retiro",
+                  "Terminal Retiro",
+                  "Estación Retiro"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Tigre",
+                "synonyms": [
+                  "Tigre",
+                  "Estación Tigre"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Constitución",
+                "synonyms": [
+                  "Constitución",
+                  "Estación Constitución",
+                  "Terminal Constitución"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "La Plata",
+                "synonyms": [
+                  "La Plata",
+                  "Estación La Plata"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Moreno",
+                "synonyms": [
+                  "Moreno",
+                  "Estación Moreno"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Once",
+                "synonyms": [
+                  "Once",
+                  "Plaza Once",
+                  "Estación Once"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Temperley",
+                "synonyms": [
+                  "Temperley",
+                  "Estación Temperley"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Haedo",
+                "synonyms": [
+                  "Haedo",
+                  "Estación Haedo"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Morón",
+                "synonyms": [
+                  "Morón",
+                  "Estación Morón"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Palermo",
+                "synonyms": [
+                  "Palermo",
+                  "Estación Palermo"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Belgrano",
+                "synonyms": [
+                  "Belgrano",
+                  "Estación Belgrano"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Villa Urquiza",
+                "synonyms": [
+                  "Villa Urquiza",
+                  "Estación Villa Urquiza"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "San Isidro",
+                "synonyms": [
+                  "San Isidro",
+                  "Estación San Isidro"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Quilmes",
+                "synonyms": [
+                  "Quilmes",
+                  "Estación Quilmes"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Avellaneda",
+                "synonyms": [
+                  "Avellaneda",
+                  "Estación Avellaneda"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -52,15 +52,14 @@ const getHorarioTren = async (origen, destino) => {
   }
 };
 
-const HorariosIntentHandler = {
+const GetNextTrainIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'HorariosIntent';
+      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'GetNextTrainIntent';
   },
   async handle(handlerInput) {
     const slots = handlerInput.requestEnvelope.request.intent.slots || {};
     const origen = slots.origen?.value;
-    const destino = slots.destino?.value;
 
     if (!origen) {
       return handlerInput.responseBuilder
@@ -69,18 +68,53 @@ const HorariosIntentHandler = {
         .getResponse();
     }
 
-    const tren = await getHorarioTren(origen, destino);
+    const tren = await getHorarioTren(origen);
 
     if (!tren) {
       return handlerInput.responseBuilder
-        .speak('No encontré horarios para esa ruta. ¿Querés intentar con otra estación?')
+        .speak(`No encontré horarios para ${origen}. ¿Querés intentar con otra estación?`)
+        .reprompt('¿Desde qué estación querés saber el horario?')
         .getResponse();
     }
 
     const horaSalida = tren.horario.split('T')[1].slice(0, 5);
-    const respuesta = destino
-      ? `El próximo tren desde ${origen} hacia ${destino} sale a las ${horaSalida}.`
-      : `El próximo tren desde ${origen} sale a las ${horaSalida}.`;
+    const respuesta = `El próximo tren desde ${origen} sale a las ${horaSalida}.`;
+
+    return handlerInput.responseBuilder
+      .speak(respuesta)
+      .withSimpleCard('Horarios de Trenes', respuesta)
+      .getResponse();
+  }
+};
+
+const GetTrainBetweenStationsIntentHandler = {
+  canHandle(handlerInput) {
+    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'GetTrainBetweenStationsIntent';
+  },
+  async handle(handlerInput) {
+    const slots = handlerInput.requestEnvelope.request.intent.slots || {};
+    const origen = slots.origen?.value;
+    const destino = slots.destino?.value;
+
+    if (!origen || !destino) {
+      return handlerInput.responseBuilder
+        .speak('Necesito saber tanto la estación de origen como la de destino. ¿Podés repetir?')
+        .reprompt('¿Desde qué estación a cuál querés viajar?')
+        .getResponse();
+    }
+
+    const tren = await getHorarioTren(origen, destino);
+
+    if (!tren) {
+      return handlerInput.responseBuilder
+        .speak(`No encontré horarios de ${origen} a ${destino}. ¿Querés intentar con otra ruta?`)
+        .reprompt('¿Desde qué estación a cuál querés viajar?')
+        .getResponse();
+    }
+
+    const horaSalida = tren.horario.split('T')[1].slice(0, 5);
+    const respuesta = `El próximo tren desde ${origen} hacia ${destino} sale a las ${horaSalida}.`;
 
     return handlerInput.responseBuilder
       .speak(respuesta)
@@ -94,7 +128,7 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speakOutput = 'Bienvenido a Horarios de Trenes. Podés preguntar, por ejemplo: ¿Cuándo sale el tren desde Retiro a Tigre?';
+    const speakOutput = 'Bienvenido a Horarios de Trenes. Podés preguntar por los horarios de una estación como "¿Cuándo sale el próximo tren en Retiro?" o entre dos estaciones como "¿Cuándo pasa el tren desde Retiro a Tigre?"';
     return handlerInput.responseBuilder
       .speak(speakOutput)
       .reprompt('¿Desde qué estación querés saber el horario?')
@@ -104,7 +138,12 @@ const LaunchRequestHandler = {
 
 const FallbackHandler = {
   canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+      && Alexa.getIntentName(handlerInput.requestEnvelope) !== 'GetNextTrainIntent'
+      && Alexa.getIntentName(handlerInput.requestEnvelope) !== 'GetTrainBetweenStationsIntent'
+      && Alexa.getIntentName(handlerInput.requestEnvelope) !== 'AMAZON.StopIntent'
+      && Alexa.getIntentName(handlerInput.requestEnvelope) !== 'AMAZON.HelpIntent'
+      && Alexa.getIntentName(handlerInput.requestEnvelope) !== 'AMAZON.CancelIntent';
   },
   handle(handlerInput) {
     const speakOutput = 'No entendí lo que dijiste. Probá preguntando: ¿Cuándo pasa el tren desde Retiro a Tigre?';
@@ -130,7 +169,8 @@ const ErrorHandler = {
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
-    HorariosIntentHandler,
+    GetNextTrainIntentHandler,
+    GetTrainBetweenStationsIntentHandler,
     FallbackHandler
   )
   .addErrorHandlers(ErrorHandler)

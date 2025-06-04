@@ -1,0 +1,42 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "es-ES": {
+          "name": "Horarios de Trenes Argentina",
+          "summary": "Consulta horarios de trenes en Argentina mediante voz",
+          "description": "Skill para consultar horarios de trenes entre estaciones argentinas con soporte para Echo Show",
+          "keywords": [
+            "trenes",
+            "horarios",
+            "transporte",
+            "Argentina"
+          ]
+        }
+      },
+      "distributionCountries": [
+        "ES"
+      ]
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-west-2:922438878021:function:argentina-train-schedules",
+          "sslCertificateType": "AWS_IOT"
+        }
+      }
+    },
+    "interfaces": {
+      "apl": {
+        "runtime": {
+          "maxVersion": "2023.2"
+        }
+      }
+    },
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false
+    }
+  }
+}
