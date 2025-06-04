@@ -1,14 +1,3 @@
-// export const handler = async (event) => {
-//   // TODO implement
-//   const response = {
-//     statusCode: 200,
-//     body: JSON.stringify('Hello from Lambda!'),
-//   };
-//   return response;
-// };
-
-// // src/index.js
-
 const Alexa = require('ask-sdk-core');
 const fetch = require('node-fetch');
 
