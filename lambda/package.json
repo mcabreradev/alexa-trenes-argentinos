@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "zip": "zip -r alexa-trenes-argentinos.zip index.js src/ node_modules/ -x \"*.git*\" \"*.DS_Store\"",
-    "deploy": "pnpm prune --prod && pnpm run zip",
+    "deploy": "pnpm prune --prod && rm -rf alexa-trenes-argentinos.zip && pnpm run zip",
     "prune": "pnpm prune --prod"
   },
   "dependencies": {

@@ -1,0 +1,52 @@
+{
+  "type": "APL",
+  "version": "2023.2",
+  "settings": {},
+  "theme": "dark",
+  "import": [],
+  "resources": [],
+  "styles": {},
+  "onMount": [],
+  "graphics": {},
+  "commands": {},
+  "layouts": {},
+  "mainTemplate": {
+    "parameters": [
+      "trains"
+    ],
+    "items": [
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "Text",
+            "text": "Horarios de Trenes",
+            "fontSize": "32dp",
+            "color": "#FFFFFF"
+          },
+          {
+            "type": "Sequence",
+            "data": "${trains}",
+            "items": [
+              {
+                "type": "Frame",
+                "items": [
+                  {
+                    "type": "Text",
+                    "text": "Hora: ${horaSalida}",
+                    "fontSize": "24dp"
+                  },
+                  {
+                    "type": "Text",
+                    "text": "Destino: ${destino}",
+                    "fontSize": "20dp"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
