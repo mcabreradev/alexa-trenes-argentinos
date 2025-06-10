@@ -19,10 +19,10 @@ importers:
         version: 2.7.0
     devDependencies:
       '@types/jest':
-        specifier: ^29.5.5
+        specifier: ^29.5.14
         version: 29.5.14
       '@types/node':
-        specifier: ^14.18.0
+        specifier: ^14.18.63
         version: 14.18.63
       '@types/node-fetch':
         specifier: ^2.6.0
