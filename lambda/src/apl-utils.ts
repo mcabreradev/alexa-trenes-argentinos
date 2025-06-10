@@ -1,8 +1,24 @@
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Utilidad para cargar documentos APL
-const loadAplDocument = () => {
+/**
+ * Tipo para la estructura básica de documento APL
+ */
+interface AplDocument {
+  type: string;
+  version: string;
+  theme: string;
+  mainTemplate: {
+    parameters: string[];
+    items: any[];
+  };
+}
+
+/**
+ * Carga un documento APL para renderizar en dispositivos con pantalla
+ * @returns El documento APL o null si no se puede cargar
+ */
+export const loadAplDocument = (): AplDocument | null => {
   try {
     // Primero intentamos cargar el documento APL desde la ruta relativa a la carpeta skill
     const skillAplPath = path.resolve(__dirname, '../../skill/apl-documents/train-schedule-apl.json');
@@ -69,8 +85,4 @@ const loadAplDocument = () => {
     console.error('Error cargando documento APL:', error);
     return null;
   }
-};
-
-module.exports = {
-  loadAplDocument
 };

@@ -1,9 +1,11 @@
-const Alexa = require('ask-sdk-core');
-const { loadAplDocument } = require('./apl-utils');
+import * as Alexa from 'ask-sdk-core';
+import { RequestHandler, HandlerInput, ErrorHandler } from 'ask-sdk-core';
+import { Response } from 'ask-sdk-model';
+import { loadAplDocument } from './apl-utils';
 
 // Importar nuestros servicios y helpers
-const { HorariosService } = require('./services/horarios-service.js');
-const { AlexaSlotHelper } = require('./helpers/alexa-slot-helper.js');
+import { HorariosService } from './services/horarios-service';
+import { AlexaSlotHelper } from './helpers/alexa-slot-helper';
 
 // Crear instancia del servicio de horarios
 const horariosService = new HorariosService();
@@ -11,12 +13,12 @@ const horariosService = new HorariosService();
 /**
  * Handler para obtener el próximo tren desde una estación
  */
-const GetNextTrainIntentHandler = {
-  canHandle(handlerInput) {
+const GetNextTrainIntentHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'GetNextTrainIntent';
   },
-  async handle(handlerInput) {
+  async handle(handlerInput: HandlerInput): Promise<Response> {
     // Extraer el valor del slot origen usando nuestro helper
     const origen = AlexaSlotHelper.getSlotValue(handlerInput.requestEnvelope, 'origen');
     console.log('GetNextTrainIntent - Origen final:', origen);
@@ -85,12 +87,12 @@ const GetNextTrainIntentHandler = {
 /**
  * Handler para obtener trenes entre dos estaciones
  */
-const GetTrainBetweenStationsIntentHandler = {
-  canHandle(handlerInput) {
+const GetTrainBetweenStationsIntentHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'GetTrainBetweenStationsIntent';
   },
-  async handle(handlerInput) {
+  async handle(handlerInput: HandlerInput): Promise<Response> {
     // Extraer valores de slots usando nuestro helper
     const { origen, destino } = AlexaSlotHelper.getSlotValues(
       handlerInput.requestEnvelope, ['origen', 'destino']
@@ -165,12 +167,12 @@ const GetTrainBetweenStationsIntentHandler = {
 /**
  * Handler para obtener el primer tren mañana
  */
-const GetFirstTrainTomorrowIntentHandler = {
-  canHandle(handlerInput) {
+const GetFirstTrainTomorrowIntentHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'GetFirstTrainTomorrowIntent';
   },
-  async handle(handlerInput) {
+  async handle(handlerInput: HandlerInput): Promise<Response> {
     // Extraer el valor del slot origen
     const origen = AlexaSlotHelper.getSlotValue(handlerInput.requestEnvelope, 'origen');
     console.log('GetFirstTrainTomorrowIntent - Origen final:', origen);
@@ -238,12 +240,12 @@ const GetFirstTrainTomorrowIntentHandler = {
 /**
  * Handler para la ayuda
  */
-const HelpIntentHandler = {
-  canHandle(handlerInput) {
+const HelpIntentHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent';
   },
-  handle(handlerInput) {
+  handle(handlerInput: HandlerInput): Response {
     const speakOutput = 'Puedo darte información sobre horarios de trenes en Argentina. ' +
                         'Puedes preguntarme cosas como "¿cuándo sale el próximo tren desde Retiro?", ' +
                         '"¿a qué hora es el tren de Constitución a Temperley?" o ' +
@@ -259,13 +261,13 @@ const HelpIntentHandler = {
 /**
  * Handler para cancelar
  */
-const CancelAndStopIntentHandler = {
-  canHandle(handlerInput) {
+const CancelAndStopIntentHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
       && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent'
         || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
   },
-  handle(handlerInput) {
+  handle(handlerInput: HandlerInput): Response {
     const speakOutput = '¡Hasta pronto! Si necesitas consultar horarios de trenes, aquí estaré.';
 
     return handlerInput.responseBuilder
@@ -277,12 +279,12 @@ const CancelAndStopIntentHandler = {
 /**
  * Handler para intents no reconocidos
  */
-const FallbackIntentHandler = {
-  canHandle(handlerInput) {
+const FallbackIntentHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
   },
-  handle(handlerInput) {
+  handle(handlerInput: HandlerInput): Response {
     const speakOutput = 'Lo siento, no entendí lo que querías hacer. ' +
                         'Puedes preguntarme sobre horarios de trenes, por ejemplo: ' +
                         '"¿cuándo sale el próximo tren desde Retiro?" o ' +
@@ -298,11 +300,11 @@ const FallbackIntentHandler = {
 /**
  * Handler para errores
  */
-const ErrorHandler = {
-  canHandle() {
+const ErrorHandler: ErrorHandler = {
+  canHandle(): boolean {
     return true;
   },
-  handle(handlerInput, error) {
+  handle(handlerInput: HandlerInput, error: Error): Response {
     console.error('Error manejado:', error);
     
     const speakOutput = 'Lo siento, ha ocurrido un error al procesar tu solicitud. ' +
@@ -318,11 +320,11 @@ const ErrorHandler = {
 /**
  * Handler para cuando la sesión se inicia
  */
-const LaunchRequestHandler = {
-  canHandle(handlerInput) {
+const LaunchRequestHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
-  handle(handlerInput) {
+  handle(handlerInput: HandlerInput): Response {
     const speakOutput = 'Bienvenido a Horarios de Trenes Argentinos. ' +
                         'Puedes preguntarme por el próximo tren desde una estación, ' +
                         'horarios entre dos estaciones o el primer tren de mañana. ' +
@@ -338,18 +340,21 @@ const LaunchRequestHandler = {
 /**
  * Handler para cuando termina la sesión
  */
-const SessionEndedRequestHandler = {
-  canHandle(handlerInput) {
+const SessionEndedRequestHandler: RequestHandler = {
+  canHandle(handlerInput: HandlerInput): boolean {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
   },
-  handle(handlerInput) {
-    console.log(`Sesión finalizada: ${handlerInput.requestEnvelope.request.reason}`);
+  handle(handlerInput: HandlerInput): Response {
+    // TypeScript no reconoce la propiedad reason en el tipo genérico Request
+    // Pero sabemos que para SessionEndedRequest, esta propiedad existe
+    const request = handlerInput.requestEnvelope.request as any;
+    console.log(`Sesión finalizada: ${request.reason || 'Sin razón especificada'}`);
     return handlerInput.responseBuilder.getResponse();
   }
 };
 
 // Exportar el skill handler
-exports.handler = Alexa.SkillBuilders.custom()
+export const handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
     GetNextTrainIntentHandler,

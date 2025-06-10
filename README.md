@@ -19,7 +19,7 @@ alexa-trenes-argentinos/
 ├── lambda/                   # Código de backend (AWS Lambda)
 │   ├── apl-documents/        # Documentos APL para visualización
 │   │   └── train-schedule-apl.json
-│   ├── src/                  # Código fuente
+│   ├── src/                  # Código fuente TypeScript
 │   │   ├── helpers/          # Utilidades y funciones auxiliares
 │   │   │   ├── alexa-slot-helper.ts    # Manejo de slots de Alexa
 │   │   │   └── estaciones-helper.ts    # Procesamiento de nombres de estaciones
@@ -28,8 +28,12 @@ alexa-trenes-argentinos/
 │   │   │   └── trenes-api-service.ts   # Cliente de API
 │   │   ├── types/            # Definiciones de tipos TypeScript
 │   │   │   └── api-types.ts            # Interfaces y tipos para la API
-│   │   ├── apl-utils.js      # Utilidades para APL
-│   │   └── index.js          # Punto de entrada principal
+│   │   ├── apl-utils.ts      # Utilidades para APL
+│   │   └── index.ts          # Punto de entrada principal
+│   ├── dist/                 # Código JavaScript compilado
+│   │   ├── helpers/          # Versiones compiladas de los helpers
+│   │   ├── services/         # Versiones compiladas de los servicios
+│   │   └── types/            # Versiones compiladas de los tipos
 │   ├── package.json          # Dependencias y scripts
 │   └── tsconfig.json         # Configuración de TypeScript
 └── skill/                    # Configuración de la skill
@@ -45,6 +49,7 @@ alexa-trenes-argentinos/
 - **Alexa Skills Kit (ASK)**: SDK para desarrollo de skills
 - **APL (Alexa Presentation Language)**: Para interfaces visuales
 - **API REST**: Comunicación con el servicio de horarios
+- **Jest**: Framework para pruebas unitarias
 
 ## Modelo de Interacción
 
@@ -131,7 +136,7 @@ const origen = AlexaSlotHelper.getSlotValue(handlerInput.requestEnvelope, 'orige
 
 ## Visualización con APL
 
-La skill incluye soporte para dispositivos con pantalla mediante APL (Alexa Presentation Language). 
+La skill incluye soporte para dispositivos con pantalla mediante APL (Alexa Presentation Language).
 Los documentos APL se encuentran en `lambda/apl-documents/` y muestran información visual sobre:
 
 - Horario de salida
@@ -143,10 +148,99 @@ Los documentos APL se encuentran en `lambda/apl-documents/` y muestran informaci
 El servicio utiliza una API personalizada que actúa como proxy de la API oficial de Trenes Argentinos:
 
 - **BASE URL**: `https://ariedro.dev/api-trenes`
-- **ENDPOINTS**:
-  - `/infraestructura/estaciones`: Información sobre estaciones
-  - `/infraestructura/ramales`: Información sobre ramales
-  - `/arribos/estacion/{id}`: Horarios de arribos a una estación
+
+### Endpoints
+
+1. **Estaciones**
+   - URL: `/infraestructura/estaciones`
+   - Método: `GET`
+   - Parámetros:
+     - `nombre` (opcional): Filtrar por nombre de estación
+     - `ramal` (opcional): Filtrar por ramal
+   - Respuesta:
+     ```json
+     [
+       {
+         "id": "RTR",
+         "nombre": "Retiro",
+         "ramal": "R1"
+       },
+       {
+         "id": "CST",
+         "nombre": "Constitución",
+         "ramal": "R2"
+       }
+     ]
+     ```
+
+2. **Ramales**
+   - URL: `/infraestructura/ramales`
+   - Método: `GET`
+   - Parámetros:
+     - `id` (opcional): Filtrar por ID de ramal
+     - `nombre` (opcional): Filtrar por nombre de ramal
+   - Respuesta:
+     ```json
+     [
+       {
+         "id": "R1",
+         "nombre": "Ramal Tigre",
+         "estaciones": ["RTR", "PAL", "TIG"]
+       },
+       {
+         "id": "R2",
+         "nombre": "Ramal Lomas de Zamora",
+         "estaciones": ["CST", "AVE", "LDZ"]
+       }
+     ]
+     ```
+
+3. **Arribos a Estación**
+   - URL: `/arribos/estacion/{id}`
+   - Método: `GET`
+   - Parámetros:
+     - `fecha` (opcional): Fecha en formato YYYY-MM-DD
+     - `hora` (opcional): Hora en formato HH:MM
+     - `limite` (opcional): Límite de resultados
+   - Respuesta:
+     ```json
+     [
+       {
+         "ramal": "R1",
+         "estacionOrigen": "RTR",
+         "estacionDestino": "TIG",
+         "horaSalida": "14:30",
+         "horaLlegada": "15:15",
+         "servicioId": "S123",
+         "fechaServicio": "2025-06-09"
+       }
+     ]
+     ```
+
+4. **Horarios entre Estaciones**
+   - URL: `/horarios/{origen}/{destino}`
+   - Método: `GET`
+   - Parámetros:
+     - `fecha` (opcional): Fecha en formato YYYY-MM-DD
+     - `hora` (opcional): Hora a partir de la cual buscar
+     - `limite` (opcional): Límite de resultados
+   - Respuesta: Similar a Arribos
+
+### Manejo de Errores
+
+La API devuelve códigos de estado HTTP estándar:
+- `200 OK`: Respuesta exitosa
+- `400 Bad Request`: Error en los parámetros
+- `404 Not Found`: Recurso no encontrado
+- `500 Internal Server Error`: Error del servidor
+
+Los errores incluyen un mensaje descriptivo:
+```json
+{
+  "error": true,
+  "mensaje": "Descripción del error"
+}
+```
 
 ## Despliegue
 
@@ -171,7 +265,7 @@ Para desplegar la skill, siga estos pasos:
 4. **Subir a AWS Lambda**:
    - Cree una función Lambda en AWS
    - Suba el archivo zip generado
-   - Configure el handler como `index.handler`
+   - Configure el handler como `dist/index.handler`
 
 5. **Configurar la Skill**:
    - Cree una nueva skill en [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask)
@@ -189,13 +283,67 @@ Para desarrollar y probar localmente:
 
 2. **Compilar en modo watch**:
    ```bash
-   pnpm tsc --watch
+   pnpm watch
    ```
 
-3. **Pruebas locales**:
+3. **Ejecutar pruebas unitarias**:
    ```bash
-   node -e "const { HorariosService } = require('./src/services/horarios-service.js'); const service = new HorariosService(); async function test() { const result = await service.obtenerProximoTren('Retiro'); console.log(result); } test().catch(console.error);"
+   pnpm test
    ```
+
+4. **Ver cobertura de pruebas**:
+   ```bash
+   pnpm test:coverage
+   ```
+
+5. **Pruebas locales**:
+   ```bash
+   # Usando el servicio compilado
+   node -e "const { HorariosService } = require('./dist/services/horarios-service'); const service = new HorariosService(); async function test() { const result = await service.obtenerProximoTren('Retiro'); console.log(result); } test().catch(console.error);"
+   
+   # O ejecutando la aplicación completa
+   pnpm start
+   ```
+
+## Pruebas Unitarias
+
+El proyecto incluye pruebas unitarias completas para todos los componentes principales:
+
+- **Helpers**: Pruebas para `AlexaSlotHelper` y `EstacionesHelper`
+- **Servicios**: Pruebas para `TrenesApiService` y `HorariosService`
+
+Las pruebas están organizadas en la carpeta `tests/` con una estructura que refleja la estructura de `src/`:
+
+```
+tests/
+├── helpers/
+│   ├── alexa-slot-helper.test.ts
+│   └── estaciones-helper.test.ts
+├── services/
+│   ├── horarios-service.test.ts
+│   └── trenes-api-service.test.ts
+└── mocks/
+    ├── api-types.mock.ts
+    └── request-envelope.mock.ts
+```
+
+Para ejecutar las pruebas:
+
+```bash
+pnpm test                 # Ejecutar todas las pruebas
+pnpm test:watch           # Ejecutar en modo watch (para desarrollo)
+pnpm test:coverage        # Generar informe de cobertura
+```
+
+### Mocking
+
+- Se utiliza Jest para mockear dependencias externas como `node-fetch`
+- Se mockea `TrenesApiService` en las pruebas de `HorariosService`
+- Uso de mocks para `RequestEnvelope` de Alexa en las pruebas de helpers
+
+### Cobertura
+
+El proyecto tiene como objetivo mantener una cobertura de pruebas superior al 80% para todos los archivos excepto los tipos.
 
 ## Manejo de Errores
 
@@ -217,6 +365,15 @@ Para contribuir al proyecto:
 4. Push a la rama (`git push origin feature/nueva-caracteristica`)
 5. Crear Pull Request
 
+## Documentación Detallada
+
+Para más información sobre el desarrollo, consulta la documentación detallada:
+
+- [Guía del Desarrollador](docs/developer-guide.md) - Configuración, arquitectura y buenas prácticas
+- [Referencia de API](docs/api-reference.md) - Detalles sobre endpoints y modelos de datos
+- [Guía de Extensión](docs/extension-guide.md) - Cómo añadir nuevas funcionalidades
+- [Referencia Rápida](docs/quick-reference.md) - Comandos y ejemplos comunes
+
 ## Licencia
 
 Este proyecto está licenciado bajo la Licencia MIT - vea el archivo LICENSE para más detalles.
@@ -224,8 +381,8 @@ Este proyecto está licenciado bajo la Licencia MIT - vea el archivo LICENSE par
 ## Contacto
 
 Para cualquier consulta o sugerencia, contactar a:
-- Autor: [Tu Nombre]
-- Email: [tu.email@ejemplo.com]
+- Autor: Miguelangel Cabrera
+- Email: mcabrera.dev@gmail.com
 
 ---
 

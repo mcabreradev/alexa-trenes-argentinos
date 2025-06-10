@@ -2,13 +2,21 @@
   "name": "alexa-trenes-argentinos",
   "version": "1.0.0",
   "description": "Skill de Alexa para consultar horarios de trenes en Argentina",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node src/index.js",
-    "zip": "zip -r alexa-trenes-argentinos.zip index.js src/ node_modules/ -x \"*.git*\" \"*.DS_Store\" \"*.ts\"",
-    "deploy": "pnpm build && pnpm prune --prod && rm -rf alexa-trenes-argentinos.zip && pnpm run zip",
-    "prune": "pnpm prune --prod"
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "start": "node dist/index.js",
+    "prebuild": "npm run clean",
+    "predeploy": "npm run clean && npm run build",
+    "zip": "zip -r alexa-trenes-argentinos.zip index.js dist/ node_modules/ apl-documents/ -x \"*.git*\" \"*.DS_Store\" \"**/node_modules/*/test/*\" \"**/node_modules/*/tests/*\" \"**/node_modules/*/docs/*\" \"**/node_modules/*/examples/*\" \"**/node_modules/*/coverage/*\"",
+    "deploy": "bash scripts/optimize-deploy.sh",
+    "deploy:legacy": "npm run predeploy && pnpm prune --prod && rm -rf alexa-trenes-argentinos.zip && pnpm run zip",
+    "prune": "pnpm prune --prod",
+    "test": "jest --config jest.config.js",
+    "test:watch": "jest --config jest.config.js --watch",
+    "test:coverage": "jest --config jest.config.js --coverage"
   },
   "dependencies": {
     "ask-sdk-core": "^2.12.1",
@@ -16,8 +24,11 @@
     "node-fetch": "^2.6.9"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.5",
     "@types/node": "^14.18.0",
     "@types/node-fetch": "^2.6.0",
-    "typescript": "^4.9.0"
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^4.9.5"
   }
 }
