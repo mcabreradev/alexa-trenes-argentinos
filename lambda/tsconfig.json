@@ -10,7 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "types": ["node", "jest"],
+    "lib": ["ES2018", "DOM"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts", "dist"]
