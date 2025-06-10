@@ -4,9 +4,10 @@
   "description": "Skill de Alexa para consultar horarios de trenes en Argentina",
   "main": "src/index.js",
   "scripts": {
+    "build": "tsc",
     "start": "node src/index.js",
-    "zip": "zip -r alexa-trenes-argentinos.zip index.js src/ node_modules/ -x \"*.git*\" \"*.DS_Store\"",
-    "deploy": "pnpm prune --prod && rm -rf alexa-trenes-argentinos.zip && pnpm run zip",
+    "zip": "zip -r alexa-trenes-argentinos.zip index.js src/ node_modules/ -x \"*.git*\" \"*.DS_Store\" \"*.ts\"",
+    "deploy": "pnpm build && pnpm prune --prod && rm -rf alexa-trenes-argentinos.zip && pnpm run zip",
     "prune": "pnpm prune --prod"
   },
   "dependencies": {
@@ -14,5 +15,9 @@
     "ask-sdk-model": "^1.29.0",
     "node-fetch": "^2.6.9"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^14.18.0",
+    "@types/node-fetch": "^2.6.0",
+    "typescript": "^4.9.0"
+  }
 }

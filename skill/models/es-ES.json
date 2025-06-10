@@ -80,6 +80,24 @@
         {
           "name": "AMAZON.FallbackIntent",
           "samples": []
+        },
+        {
+          "name": "GetFirstTrainTomorrowIntent",
+          "slots": [
+            {
+              "name": "origen",
+              "type": "ESTACION"
+            }
+          ],
+          "samples": [
+            "primer tren mañana desde {origen}",
+            "primer tren de mañana en {origen}",
+            "a qué hora sale el primer tren mañana en {origen}",
+            "horario del primer tren mañana desde {origen}",
+            "cuándo pasa el primer tren mañana por {origen}",
+            "horarios de mañana en {origen}",
+            "trenes para mañana desde {origen}"
+          ]
         }
       ],
       "types": [
